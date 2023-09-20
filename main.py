@@ -30,6 +30,7 @@ def split_number(vec):
 def bit_shift(number, n):
     # append n 0s to this number's binary string
     return binary2int(number.binary_vec + ['0'] * n)
+
     
 def pad(x,y):
     # pad with leading 0 if x/y have different number of bits
@@ -49,18 +50,46 @@ def quadratic_multiply(x, y):
     return _quadratic_multiply(x,y).decimal_val
 
 def _quadratic_multiply(x, y):
-    ### TODO
-    pass
-    ###
+    #base cases, if either x or y <= 1, just return their product
+    if ((x.decimal_val <= 1) or (y.decimal_val  <= 1)):
+        return BinaryNumber(x.decimal_val*y.decimal_val)
+    #recursive case
+    else: 
+        #obtain xvec and yvec, the binary_vec values of x and y
+        xvec = x.binary_vec
+        yvec = y.binary_vec
+        #pad xvec and yec so they are the same length and update the variables
+        xvec = pad(xvec, yvec)[0]
+        yvec = pad(xvec, yvec)[1]
+        #split xvec and yvec into two halves
+        x_left = split_number(xvec)[0]
+        x_right = split_number(xvec)[1]
+        y_left = split_number(yvec)[0]
+        y_right = split_number(yvec)[1]
+        """
+        return their product using given formula
+        The first term can be found by calling _quadratic_multiply on xl and yl, then using bit shift to multiply by 2^n, where n is the length of xvec (or yvec)
+        The second term can be found by using _quadratic_multiply on xl yr and xr yl i then add together the decimal values of these fucntions and convert the sum back to a binary number so I can use bit shift on it to shift this value over 2^n/2, where n is the length of xvec (or yvec)
+        The third term can be found using _quadratic_multiply on xr and yr
+        I then take the decimal value of each term so i can sum them together
+        I then return the BinaryNumber of the sum
+        """
+        return BinaryNumber((bit_shift(_quadratic_multiply(x_left, y_left), len(xvec))).decimal_val + (bit_shift(BinaryNumber((_quadratic_multiply(x_left, y_right)).decimal_val + (_quadratic_multiply(x_right, y_left)).decimal_val), (len(xvec)//2))).decimal_val + ((_quadratic_multiply(x_right, y_right))).decimal_val)
+        
 
-
-    
-    
+  
 def test_quadratic_multiply(x, y, f):
     start = time.time()
     # multiply two numbers x, y using function f
-    
+    f(x,y)
     return (time.time() - start)*1000
+
+print(test_quadratic_multiply(BinaryNumber(2),BinaryNumber(1),quadratic_multiply))
+print(test_quadratic_multiply(BinaryNumber(2),BinaryNumber(10),quadratic_multiply))
+print(test_quadratic_multiply(BinaryNumber(2),BinaryNumber(100),quadratic_multiply))
+print(test_quadratic_multiply(BinaryNumber(2),BinaryNumber(1000),quadratic_multiply))
+print(test_quadratic_multiply(BinaryNumber(2),BinaryNumber(10000),quadratic_multiply))
+print(test_quadratic_multiply(BinaryNumber(2),BinaryNumber(100000),quadratic_multiply))
 
 
     
